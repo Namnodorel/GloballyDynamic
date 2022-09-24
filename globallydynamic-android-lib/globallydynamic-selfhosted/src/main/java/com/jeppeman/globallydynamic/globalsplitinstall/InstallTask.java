@@ -3,6 +3,7 @@ package com.jeppeman.globallydynamic.globalsplitinstall;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -13,10 +14,12 @@ import com.jeppeman.globallydynamic.tasks.OnGlobalSplitInstallCompleteListener;
 import com.jeppeman.globallydynamic.tasks.OnGlobalSplitInstallFailureListener;
 import com.jeppeman.globallydynamic.tasks.OnGlobalSplitInstallSuccessListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -148,7 +151,16 @@ class InstallTaskImpl
                 result.doOnSuccess(new Result.Success.Callback<GloballyDynamicConfigurationDto>() {
                     @Override
                     public void success(GloballyDynamicConfigurationDto configuration) {
-                        startDownload(configuration);
+                        List<File> apks = getInstallRequest().getApkLocations();
+                        if (apks.isEmpty()) {
+                            startDownload(configuration);
+
+                        } else {
+                            handleDownloadSuccessful(new ApkDownloadRequest.Status.Successful(
+                                    1, 1,
+                                    apks
+                            ));
+                        }
                     }
                 }).doOnFailure(new Result.Failure.Callback() {
                     @Override

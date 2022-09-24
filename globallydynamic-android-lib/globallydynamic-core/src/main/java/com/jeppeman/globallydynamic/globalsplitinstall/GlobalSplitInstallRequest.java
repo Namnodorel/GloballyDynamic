@@ -1,5 +1,8 @@
 package com.jeppeman.globallydynamic.globalsplitinstall;
 
+import android.net.Uri;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -10,14 +13,16 @@ import java.util.Locale;
 public class GlobalSplitInstallRequest {
     private final List<String> moduleNames;
     private final List<Locale> languages;
+    private final List<File> apkLocations;
 
     private GlobalSplitInstallRequest() {
         throw new IllegalStateException("Not allowed");
     }
 
-    private GlobalSplitInstallRequest(List<String> moduleNames, List<Locale> languages) {
+    private GlobalSplitInstallRequest(List<String> moduleNames, List<Locale> languages, List<File> apkLocations) {
         this.moduleNames = moduleNames;
         this.languages = languages;
+        this.apkLocations = apkLocations;
     }
 
     public List<String> getModuleNames() {
@@ -26,6 +31,10 @@ public class GlobalSplitInstallRequest {
 
     public List<Locale> getLanguages() {
         return languages;
+    }
+
+    public List<File> getApkLocations() {
+        return apkLocations;
     }
 
     /**
@@ -43,6 +52,7 @@ public class GlobalSplitInstallRequest {
     public static class Builder {
         private List<String> moduleNames = new LinkedList<String>();
         private List<Locale> languages = new LinkedList<Locale>();
+        private final List<File> apkLocations = new LinkedList<>();
 
         private Builder() {
 
@@ -71,13 +81,24 @@ public class GlobalSplitInstallRequest {
         }
 
         /**
+         * Add a location of an APK to be installed
+         *
+         * @param file the location of the APK to be installed
+         * @return itself
+         */
+        public Builder addApkLocation(File file) {
+            this.apkLocations.add(file);
+            return this;
+        }
+
+        /**
          * Builds a new {@link GlobalSplitInstallRequest} with the modules and languages
          * added to this builder.
          *
          * @return a new {@link GlobalSplitInstallRequest}
          */
         public GlobalSplitInstallRequest build() {
-            return new GlobalSplitInstallRequest(moduleNames, languages);
+            return new GlobalSplitInstallRequest(moduleNames, languages, apkLocations);
         }
     }
 }
